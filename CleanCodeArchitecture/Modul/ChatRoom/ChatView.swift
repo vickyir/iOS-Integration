@@ -6,3 +6,17 @@
 //
 
 import Foundation
+import UIKit
+
+class ChatViewController: UIViewController, PTVChatProtocol {
+    var presenter: PTPChatProtocol?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .blue
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+    }
+}

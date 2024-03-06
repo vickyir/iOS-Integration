@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+
+class ChatInteractor: PTIChatProtocol {
+    var presenter: PTPChatProtocol?
+    
+    
+}

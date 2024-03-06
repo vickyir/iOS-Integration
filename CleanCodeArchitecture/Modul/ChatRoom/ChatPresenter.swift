@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+
+class ChatPresenter: PTPChatProtocol {
+    var view: PTVChatProtocol?
+    
+    var interactor: PTIChatProtocol?
+    
+    var router: PTRChatProtocol?
+    
+    
+}

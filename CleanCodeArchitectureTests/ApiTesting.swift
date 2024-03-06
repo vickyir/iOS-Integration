@@ -53,9 +53,10 @@ final class ApiTesting: XCTestCase {
             if let error = error {
                 XCTFail("error: \(error)")
                 return
+            }else{
+                XCTAssertTrue(isCompleted)
             }
-
-            XCTAssertTrue(isCompleted)
+            
         }
         
    

@@ -22,7 +22,10 @@ class LoginViewController: UIViewController {
     private var emailField: UITextField = {
         let textfield = UITextField()
         textfield.placeholder = "Email"
+        textfield.returnKeyType = .continue
         textfield.textColor = .black
+        textfield.autocapitalizationType = .none
+        textfield.autocorrectionType = .no
         textfield.backgroundColor = .white
         textfield.layer.borderWidth = 1
         textfield.layer.borderColor = UIColor.gray.cgColor
@@ -41,6 +44,9 @@ class LoginViewController: UIViewController {
     private var passwordField: UITextField = {
         let textfield = UITextField()
         textfield.placeholder = "Password"
+        textfield.returnKeyType = .done
+        textfield.autocapitalizationType = .none
+        textfield.autocorrectionType = .no
         textfield.layer.cornerRadius = 12
         textfield.textColor = .black
         textfield.layer.borderWidth = 1
@@ -137,6 +143,7 @@ class LoginViewController: UIViewController {
         btnSubmit.addTarget(self, action: #selector(onLogin), for: .touchUpInside)
         btnGoogle.addTarget(self, action: #selector(onGoogleLogin), for: .touchUpInside)
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .plain, target: self, action: #selector(setToRegister))
+        self.dismissKeybord()
     }
     
     @objc func setToRegister() {
@@ -245,5 +252,15 @@ class LoginViewController: UIViewController {
 }
 
 extension LoginViewController: UITextFieldDelegate{
-    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        if textField == emailField {
+            passwordField.becomeFirstResponder()
+        }else if (textField == passwordField){
+            view.endEditing(true)
+            onLogin()
+        }
+        
+        return true
+    }
 }

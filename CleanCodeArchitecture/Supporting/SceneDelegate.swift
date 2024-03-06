@@ -40,7 +40,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if Auth.auth().currentUser == nil {
             navigateToViewController(with: LoginViewController())
         }else{
-            let defaultRouter = ModulRouter.startEntry()
+            let defaultRouter = ChatRouter.entryChat()
             guard let vc = defaultRouter.entry else {
                 return
             }
