@@ -59,6 +59,20 @@ final class ApiTesting: XCTestCase {
             
         }
         
-   
     }
+    
+    func testGetData() async  {
+        let url = "http://localhost:3000/api/users/getAllUsers"
+        let network = Api.shared
+        
+        do{
+            let fetch = try await network.getDataWithBearerToken(with: url)
+            print("ini adalah : \(fetch.error)")
+            print(fetch.message)
+            XCTAssertNotNil(fetch)
+        }catch{
+            XCTFail("error : \(error.localizedDescription)")
+        }
+    }
+    
 }

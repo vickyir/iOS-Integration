@@ -12,6 +12,7 @@ target 'CleanCodeArchitecture' do
     pod 'FirebaseAuth'
     pod 'FirebaseFirestore'
     pod 'FirebaseStorage'
+    pod 'FirebaseDatabase'
     pod 'GoogleSignIn'
     
 

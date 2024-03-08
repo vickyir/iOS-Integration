@@ -20,6 +20,17 @@ class RegisterViewController: UIViewController {
         return progress
     }()
     
+    private var userProfileImg: UIImageView = {
+        let image = UIImageView()
+        image.image = UIImage(systemName: "person.crop.circle.fill")
+        image.contentMode = .scaleAspectFill
+        image.tintColor = .gray
+        image.layer.masksToBounds = true
+        image.translatesAutoresizingMaskIntoConstraints = false
+        
+        return image
+    }()
+    
     private var lblLogin: UILabel = {
         let label = UILabel()
         label.text = "Register Page"
@@ -141,7 +152,7 @@ class RegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-    
+        
         setProtocol()
         setView()
         setAction()
@@ -153,10 +164,11 @@ class RegisterViewController: UIViewController {
     }
     
     func setProtocol(){
-      
+        
     }
     
     func setView(){
+        view.addSubview(userProfileImg)
         view.addSubview(progressView)
         view.addSubview(lblLogin)
         view.addSubview(firstNameField)
@@ -174,7 +186,12 @@ class RegisterViewController: UIViewController {
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             progressView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            lblLogin.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -200),
+            userProfileImg.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -250),
+            userProfileImg.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            userProfileImg.widthAnchor.constraint(equalToConstant: 100),
+            userProfileImg.heightAnchor.constraint(equalToConstant: 100),
+            
+            lblLogin.topAnchor.constraint(equalTo: userProfileImg.bottomAnchor, constant: 30),
             lblLogin.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             firstNameField.topAnchor.constraint(equalTo: lblLogin.bottomAnchor, constant: 30),
@@ -211,10 +228,17 @@ class RegisterViewController: UIViewController {
     
     func setAction() {
         btnSubmit.addTarget(self, action: #selector(onRegister), for: .touchUpInside)
+        let gestureProfile = UITapGestureRecognizer(target: self, action: #selector(setProfilePict))
+        userProfileImg.isUserInteractionEnabled = true
+        userProfileImg.addGestureRecognizer(gestureProfile)
+    }
+    
+    @objc func setProfilePict(){
+        presentPhotoActionSheet()
     }
     
     @objc func onRegister(){
-       
+        
         // Show the loading overlay
         LoadingOverlay.shared.showOverlay(view: self.view, loadingText: "Registering...")
         
@@ -245,6 +269,90 @@ class RegisterViewController: UIViewController {
             
         }
         
+    }
+    
+}
+
+extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func presentPhotoActionSheet(){
+        let action = UIAlertController(title: "Profile Picture",
+                                       message: "Please Choose Your Photo",
+                                       preferredStyle: .actionSheet)
+        
+        action.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        action.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: {[weak self] _ in
+            self?.presentCamera()
+        }))
+        action.addAction(UIAlertAction(title: "Choose Photos", style: .default, handler: {[weak self] _ in
+            self?.presentPhotoPicker()
+        }))
+        
+        self.present(action, animated: true)
+    }
+    
+    func presentCamera(){
+        DispatchQueue.main.async {
+            LoadingOverlay.shared.showOverlay(view: self.view , loadingText: "Wait...")
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            sleep(1)
+            
+            DispatchQueue.main.async {
+                LoadingOverlay.shared.hideOverlayView()
+                
+                var vc = UIImagePickerController()
+                vc.delegate = self
+                vc.sourceType = .camera
+                vc.allowsEditing = true
+                self.present(vc, animated: true)
+            }
+        }
+        
+        
+    }
+    
+    func presentPhotoPicker(){
+        // Show the loading overlay on the main thread
+        DispatchQueue.main.async {
+            LoadingOverlay.shared.showOverlay(view: self.view, loadingText: "Wait...")
+        }
+        
+        // Simulate a delay to represent the time it takes to prepare the photo picker
+        DispatchQueue.global(qos: .userInitiated).async {
+            sleep(1) // Simulate work being done
+            
+            DispatchQueue.main.async {
+                // Hide the loading overlay before presenting the photo picker
+                LoadingOverlay.shared.hideOverlayView()
+                
+                var vc = UIImagePickerController()
+                vc.delegate = self
+                vc.sourceType = .photoLibrary
+                vc.allowsEditing = true
+                
+                // Present the photo picker on the main thread
+                self.present(vc, animated: true)
+            }
+        }
+        
+        
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        guard let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {
+            return
+        }
+    
+        self.userProfileImg.image = image.makeCircular()
+        
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
     
 }

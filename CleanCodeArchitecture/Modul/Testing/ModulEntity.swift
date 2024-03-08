@@ -33,3 +33,8 @@ struct ResponseLogin: Codable {
     let message: String
     let token: String
 }
+
+struct ResponseData: Codable {
+    let error: Bool
+    let message: String
+}

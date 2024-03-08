@@ -18,6 +18,9 @@ enum MyError: Error{
 
 class Api {
     static let shared = Api()
+    
+    public init(){}
+    
     let baseUrl = "https://api.github.com/"
     
     
@@ -211,6 +214,60 @@ class Api {
         
         let decodedResponse = try JSONDecoder().decode(ResponseLogin.self, from: responseData)
         return decodedResponse
+    }
+    
+    
+    func getDataAsync<T: Codable>(data: T.Type, from url: String) async throws -> T {
+        
+        guard let url = URL(string: "\(baseUrl)\(url)") else {
+            throw MyError.urlError
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else{
+            throw MyError.responseError
+        }
+        
+        let decoder = JSONDecoder()
+        
+        do{
+            let result = try decoder.decode(T.self, from: data)
+            return result
+        }catch{
+            throw MyError.responseError
+        }
+        
+    }
+    
+    func getDataWithBearerToken(with url: String)async throws -> ResponseData{
+        guard let url = URL(string: url) else {
+            throw MyError.urlError
+        }
+        
+        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mjk1LCJpYXQiOjE3MDk3NzU0NjAsImV4cCI6MTcwOTc4NjI2MH0.eMoWjLQMSAzvbG4EnfC_L0xaeCEX_RGjHgA2b9-dQmE"
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        // Set the content type to application/json
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw MyError.responseError
+        }
+        
+        let decoder = JSONDecoder()
+        
+        do {
+            let result = try decoder.decode(ResponseData.self, from: data)
+            return result
+        }catch{
+            throw MyError.dataError
+        }
     }
     
 }
